@@ -12,6 +12,7 @@ namespace RestaurantComenzi.UI.ViewModels
     {
         private readonly ComandaRepository _comandaRepository;
         private readonly ProdusRepository _produsRepository;
+        public ObservableCollection<Comanda> ToateComenzile { get; set; }
 
         private ObservableCollection<Comanda> _comenziActive;
         public ObservableCollection<Comanda> ComenziActive
@@ -44,22 +45,47 @@ namespace RestaurantComenzi.UI.ViewModels
 
         private void IncarcaDate()
         {
-            // 1. Incarcam comenzile active (practic toate din BD pentru demo, sau apelezi GetToateComenzile daca ai adaugat procedura)
-            // Pentru a fi simplu, presupunem ca ai o lista. Aici filtrăm doar ce nu e anulat sau livrat.
-            // (Nota: Pentru afisarea la angajati e bine sa adaugi in ComandaRepository o metoda GetAllComenzi() asemanatoare cu cea de client)
+            var comenzi = _comandaRepository.GetAllComenzi()?.ToList() ?? new();
 
-            // 2. Incarcam stocurile critice (Citim din App.config)
+           
+            ToateComenzile = new ObservableCollection<Comanda>(
+                comenzi.OrderByDescending(c => c.OraEstimativaLivrare)
+            );
+            OnPropertyChanged(nameof(ToateComenzile));
+
+            ToateComenzile.Clear();
+            ComenziActive.Clear();
+
+            foreach (var c in comenzi)
+            {
+                var comanda = new Comanda
+                {
+                    Id = c.Id,
+                    UtilizatorId = c.UtilizatorId,
+                    Stare = c.Stare,
+                    PretTotal = c.PretTotal,
+                    CostTransport = c.CostTransport,
+                    OraEstimativaLivrare = c.OraEstimativaLivrare
+                };
+
+                ToateComenzile.Add(comanda);
+
+                if (c.Stare != "livrata" && c.Stare != "anulata")
+                    ComenziActive.Add(comanda);
+            }
+
             int pragEpuizare = int.Parse(ConfigurationManager.AppSettings["LowStockThreshold"]);
+
             var preparate = _produsRepository.GetPreparate()
-                                             .Where(p => p.CantitateTotala <= pragEpuizare)
-                                             .ToList();
+                .Where(p => p.CantitateTotala <= pragEpuizare)
+                .ToList();
 
             PreparatePeTerminate.Clear();
+
             foreach (var p in preparate)
-            {
                 PreparatePeTerminate.Add(p);
-            }
         }
+
 
         private void SchimbaStare(object obj)
         {
@@ -67,20 +93,15 @@ namespace RestaurantComenzi.UI.ViewModels
             {
                 string stareNoua = c.Stare;
 
-                // Masina de stari simpla pentru fluxul comenzii
                 if (c.Stare == "inregistrata") stareNoua = "se pregateste";
                 else if (c.Stare == "se pregateste") stareNoua = "a plecat la client";
-                else if (c.Stare == "a plecat la client")
-                {
-                    stareNoua = "livrata";
-                    // Cand e livrata, in mod normal aici s-ar actualiza si stocul automat
-                }
+                else if (c.Stare == "a plecat la client") stareNoua = "livrata";
 
                 if (stareNoua != c.Stare)
                 {
                     _comandaRepository.UpdateStare(c.Id, stareNoua);
-                    c.Stare = stareNoua;
-                    OnPropertyChanged(nameof(ComenziActive)); // Refresh vizual
+
+                    IncarcaDate();
                 }
             }
         }

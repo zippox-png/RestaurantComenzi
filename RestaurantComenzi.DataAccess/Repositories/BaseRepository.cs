@@ -9,7 +9,8 @@ namespace RestaurantComenzi.DataAccess.Repositories
 
         protected BaseRepository()
         {
-            _connectionString = ConfigurationManager.ConnectionStrings["RestaurantDB"].ConnectionString;
+            var connectionSetting = ConfigurationManager.ConnectionStrings["RestaurantData"];
+            _connectionString = connectionSetting != null ? connectionSetting.ConnectionString : "Server=(localdb)\\MSSQLLocalDB;Database=RestaurantData;Trusted_Connection=True;";
         }
 
         protected SqlConnection GetConnection()

@@ -1,6 +1,3 @@
-﻿-- =============================================
--- 1. CREARE TABELE (Forma Normală 3)
--- =============================================
 
 CREATE TABLE Categorii (
     Id INT IDENTITY(1,1) PRIMARY KEY,
@@ -32,7 +29,6 @@ CREATE TABLE Preparate (
 );
 GO
 
--- Tabel separat pentru lista de fotografii (1:N)
 CREATE TABLE FotografiiPreparate (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     PreparatId INT NOT NULL,
@@ -41,14 +37,12 @@ CREATE TABLE FotografiiPreparate (
 );
 GO
 
--- Tabela pentru Alergeni
 CREATE TABLE Alergeni (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Denumire NVARCHAR(100) NOT NULL
 );
 GO
 
--- Tabel de legătură Preparate - Alergeni (M:N)
 CREATE TABLE PreparateAlergeni (
     PreparatId INT NOT NULL,
     AlergenId INT NOT NULL,
@@ -58,7 +52,6 @@ CREATE TABLE PreparateAlergeni (
 );
 GO
 
--- Tabela Meniuri (grupuri de preparate)
 CREATE TABLE Meniuri (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Denumire NVARCHAR(100) NOT NULL,
@@ -68,7 +61,6 @@ CREATE TABLE Meniuri (
 );
 GO
 
--- Tabel de legătură Meniuri - Preparate (M:N)
 CREATE TABLE MeniuriPreparate (
     MeniuId INT NOT NULL,
     PreparatId INT NOT NULL,
@@ -78,13 +70,12 @@ CREATE TABLE MeniuriPreparate (
 );
 GO
 
--- Tabela Comenzi
 CREATE TABLE Comenzi (
     Id INT IDENTITY(1,1) PRIMARY KEY,
-    CodComanda UNIQUEIDENTIFIER DEFAULT NEWID(), -- Cod unic automat
+    CodComanda UNIQUEIDENTIFIER DEFAULT NEWID(), 
     UtilizatorId INT NOT NULL,
     DataComanda DATETIME DEFAULT GETDATE(),
-    Stare NVARCHAR(50) DEFAULT 'inregistrata', -- inregistrata, se pregateste, livrata, anulata
+    Stare NVARCHAR(50) DEFAULT 'inregistrata', 
     PretTotal DECIMAL(18,2) NOT NULL,
     CostTransport DECIMAL(18,2) DEFAULT 0,
     OraEstimativaLivrare DATETIME,
@@ -92,12 +83,11 @@ CREATE TABLE Comenzi (
 );
 GO
 
--- Detaliile comenzii (ce produse și câte bucăți)
 CREATE TABLE DetaliiComanda (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     ComandaId INT NOT NULL,
-    PreparatId INT NULL, -- Poate fi NULL dacă e meniu
-    MeniuId INT NULL,    -- Poate fi NULL dacă e preparat simplu
+    PreparatId INT NULL, 
+    MeniuId INT NULL,    
     Cantitate INT NOT NULL,
     FOREIGN KEY (ComandaId) REFERENCES Comenzi(Id) ON DELETE CASCADE,
     FOREIGN KEY (PreparatId) REFERENCES Preparate(Id),
@@ -106,11 +96,6 @@ CREATE TABLE DetaliiComanda (
 GO
 
 
--- =============================================
--- 2. PROCEDURI STOCATE (Minim 10)
--- =============================================
-
--- 1. SELECT Categorii
 CREATE PROCEDURE sp_GetCategorii
 AS
 BEGIN
@@ -118,7 +103,6 @@ BEGIN
 END
 GO
 
--- 2. INSERT Categorie
 CREATE PROCEDURE sp_InsertCategorie
     @Denumire NVARCHAR(100)
 AS
@@ -127,7 +111,6 @@ BEGIN
 END
 GO
 
--- 3. SELECT (Login Utilizator)
 CREATE PROCEDURE sp_LoginUtilizator
     @Email NVARCHAR(100),
     @Parola NVARCHAR(255)
@@ -139,7 +122,6 @@ BEGIN
 END
 GO
 
--- 4. INSERT Utilizator (Register)
 CREATE PROCEDURE sp_InsertUtilizator
     @Nume NVARCHAR(50),
     @Prenume NVARCHAR(50),
@@ -154,7 +136,6 @@ BEGIN
 END
 GO
 
--- 5. SELECT Toate Preparatele
 CREATE PROCEDURE sp_GetPreparate
 AS
 BEGIN
@@ -163,7 +144,7 @@ BEGIN
 END
 GO
 
--- 6. UPDATE Stoc Preparat (folosit la livrarea unei comenzi)
+
 CREATE PROCEDURE sp_UpdateStocPreparat
     @PreparatId INT,
     @CantitateScazuta DECIMAL(18,2)
@@ -175,7 +156,6 @@ BEGIN
 END
 GO
 
--- 7. UPDATE Disponibilitate Preparat (indisponibil cand stocul e epuizat)
 CREATE PROCEDURE sp_SetPreparatIndisponibil
     @PreparatId INT
 AS
@@ -186,7 +166,6 @@ BEGIN
 END
 GO
 
--- 8. SELECT Comenzi ale unui Client
 CREATE PROCEDURE sp_GetComenziClient
     @UtilizatorId INT
 AS
@@ -198,7 +177,6 @@ BEGIN
 END
 GO
 
--- 9. UPDATE Stare Comanda (angajatul o muta din "inregistrata" in "livrata" etc)
 CREATE PROCEDURE sp_UpdateStareComanda
     @ComandaId INT,
     @StareNoua NVARCHAR(50)
@@ -210,7 +188,6 @@ BEGIN
 END
 GO
 
--- 10. INSERT Comanda Noua
 CREATE PROCEDURE sp_InsertComanda
     @UtilizatorId INT,
     @PretTotal DECIMAL(18,2),
@@ -221,7 +198,22 @@ BEGIN
     INSERT INTO Comenzi (UtilizatorId, PretTotal, CostTransport, OraEstimativaLivrare)
     VALUES (@UtilizatorId, @PretTotal, @CostTransport, @OraEstimativa);
     
-    -- Returnează ID-ul noii comenzi pentru a putea introduce apoi Detaliile (produsele)
     SELECT SCOPE_IDENTITY() AS NewComandaId;
 END
 GO
+CREATE OR ALTER PROCEDURE sp_InsertPreparat
+    @Nume NVARCHAR(100),
+    @Descriere NVARCHAR(500),
+    @Pret DECIMAL(18, 2),
+    @CategorieId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Inser?m direct �n tabelul Preparate
+    INSERT INTO [dbo].[Preparate] (Nume, Descriere, Pret, CategorieId)
+    VALUES (@Nume, @Descriere, @Pret, @CategorieId);
+    
+    -- Return?m ID-ul noului r�nd creat
+    SELECT SCOPE_IDENTITY() AS NewID;
+END

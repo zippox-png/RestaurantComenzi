@@ -1,5 +1,6 @@
 ﻿using RestaurantComenzi.BusinessLogic.Models;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace RestaurantComenzi.BusinessLogic.Services
@@ -9,46 +10,40 @@ namespace RestaurantComenzi.BusinessLogic.Services
         public MeniuRestaurantModel Produs { get; set; }
         public int Cantitate { get; set; }
     }
-
     public class CartService
     {
-        public List<CartItem> Items { get; private set; }
+        public ObservableCollection<CartItem> Items { get; } = new ObservableCollection<CartItem>();
 
-        public CartService()
+        public void AdaugaProdus(MeniuRestaurantModel produs)
         {
-            Items = new List<CartItem>();
-        }
+            var existing = Items.FirstOrDefault(x => x.Produs.Id == produs.Id);
 
-        public void AdaugaProdus(MeniuRestaurantModel produs, int cantitate = 1)
-        {
-            var existingItem = Items.FirstOrDefault(i => i.Produs.Id == produs.Id && i.Produs.TipProdus == produs.TipProdus);
-            if (existingItem != null)
-            {
-                existingItem.Cantitate += cantitate;
-            }
+            if (existing != null)
+                existing.Cantitate++;
             else
-            {
-                Items.Add(new CartItem { Produs = produs, Cantitate = cantitate });
-            }
+                Items.Add(new CartItem
+                {
+                    Produs = produs,
+                    Cantitate = 1
+                });
         }
 
         public void StergeProdus(MeniuRestaurantModel produs)
         {
-            var item = Items.FirstOrDefault(i => i.Produs.Id == produs.Id && i.Produs.TipProdus == produs.TipProdus);
+            var item = Items.FirstOrDefault(x => x.Produs.Id == produs.Id);
             if (item != null)
-            {
                 Items.Remove(item);
-            }
-        }
-
-        public decimal CalculeazaTotalBrut()
-        {
-            return Items.Sum(i => i.Produs.Pret * i.Cantitate);
         }
 
         public void GolesteCosul()
         {
             Items.Clear();
         }
+
+        public decimal CalculeazaTotalBrut()
+        {
+            return Items.Sum(x => x.Produs.Pret * x.Cantitate);
+        }
     }
+
 }

@@ -54,8 +54,8 @@
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Right"
                                            FontSize="16"/>
-
-								<Button Grid.Column="3"
+                                <TextBlock Text="{Binding Alergeni}" Foreground="Red"/>
+                                <Button Grid.Column="3"
                                         Content="✕"
                                         Command="{Binding DataContext.StergeProdusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}"

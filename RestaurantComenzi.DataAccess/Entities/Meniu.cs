@@ -6,5 +6,6 @@
         public string Denumire { get; set; }
         public int CategorieId { get; set; }
         public bool Disponibil { get; set; }
+        public int Pret {  get; set; }
     }
 }

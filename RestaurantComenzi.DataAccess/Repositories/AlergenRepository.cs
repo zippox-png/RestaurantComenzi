@@ -7,7 +7,6 @@ namespace RestaurantComenzi.DataAccess.Repositories
 {
     public class AlergenRepository : BaseRepository
     {
-        // SELECT - Pentru afișarea listei de alergeni în interfață
         public List<Alergen> GetAllAlergeni()
         {
             var alergeni = new List<Alergen>();
@@ -33,7 +32,6 @@ namespace RestaurantComenzi.DataAccess.Repositories
             return alergeni;
         }
 
-        // INSERT - Pentru funcționalitatea de adăugare (Angajat)
         public void InsertAlergen(string denumire)
         {
             using (var connection = GetConnection())

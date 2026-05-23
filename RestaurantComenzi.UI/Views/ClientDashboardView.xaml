@@ -3,22 +3,65 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:RestaurantComenzi.UI.Views">
     <Grid Margin="10">
-        <DataGrid ItemsSource="{Binding ComenziClient}" AutoGenerateColumns="False" IsReadOnly="True">
+        <DataGrid ItemsSource="{Binding ComenziClient}" AutoGenerateColumns="False" IsReadOnly="True" RowDetailsVisibilityMode="VisibleWhenSelected">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Data" Binding="{Binding DataComanda, StringFormat=dd/MM/yyyy HH:mm}"/>
+
                 <DataGridTextColumn Header="Cod" Binding="{Binding CodComanda}"/>
-                <DataGridTextColumn Header="Total" Binding="{Binding PretTotal}"/>
+
+                <DataGridTemplateColumn Header="Produse">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ItemsControl ItemsSource="{Binding Produse}" Margin="0,5">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Margin="0,2">
+                                            <Run Text="• " Foreground="Gray"/>
+                                            <Run Text="{Binding Denumire}" FontWeight="SemiBold"/>
+                                            <Run Text=" x "/>
+                                            <Run Text="{Binding Cantitate}"/>
+                                            <Run Text=" buc."/>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Header="Total de plată" Binding="{Binding PretTotal, StringFormat={}{0:C}}"/>
+
                 <DataGridTextColumn Header="Stare" Binding="{Binding Stare}"/>
+
+                <DataGridTextColumn Header="Ora estimativă livrare" Binding="{Binding OraEstimativaLivrare, StringFormat=dd/MM/yyyy HH:mm}"/>
+
                 <DataGridTemplateColumn Header="Acțiuni">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="Anulează" 
+                                    Padding="10,2"
+                                    Margin="5"
                                     Command="{Binding DataContext.AnuleazaComandaCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                                     CommandParameter="{Binding}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
+
+            <DataGrid.RowDetailsTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="10,5" Background="#F0F0F0">
+                        <TextBlock FontWeight="Bold" Text="Detalii financiare:" Margin="0,0,0,5"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="Cost transport: "/>
+                            <TextBlock Text="{Binding CostTransport, StringFormat={}{0:C}}" FontWeight="SemiBold"/>
+                            <TextBlock Text="   |   "/>
+                            <TextBlock Text="Discount aplicat: "/>
+                            <TextBlock Text="{Binding Discount, StringFormat={}{0:C}}" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </DataGrid.RowDetailsTemplate>
         </DataGrid>
     </Grid>
 </UserControl>

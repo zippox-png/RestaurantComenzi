@@ -1,4 +1,5 @@
-﻿using RestaurantComenzi.DataAccess.Entities;
+﻿using RestaurantComenzi.BusinessLogic.Services;
+using RestaurantComenzi.DataAccess.Entities;
 using RestaurantComenzi.UI.Core;
 using System.Windows.Input;
 
@@ -20,59 +21,76 @@ namespace RestaurantComenzi.UI.ViewModels
             get => _currentUser;
             set
             {
+                if (_currentUser == value)
+                    return;
+
                 _currentUser = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(CurrentUser));
                 OnPropertyChanged(nameof(IsLoggedIn));
+                OnPropertyChanged(nameof(IsLoggedOut));
+
             }
         }
 
         public bool IsLoggedIn => CurrentUser != null;
+        public bool IsLoggedOut => CurrentUser == null;
 
         public ICommand ShowMenuCommand { get; }
         public ICommand ShowLoginCommand { get; }
         public ICommand ShowCartCommand { get; }
         public ICommand LogoutCommand { get; }
+        public ICommand ShowRegisterCommand { get; }
+        public ICommand ShowAccountCommand { get; }
+        public ICommand ShowEmployeeDashboardCommand { get; }
+        private readonly CartService _cartService = new CartService();
 
         public MainViewModel()
         {
-            // Initializare vizualizare: deschidem meniul prima data
-            CurrentView = new MenuViewModel();
+            CurrentView = new MenuViewModel(_cartService);
 
-            ShowMenuCommand = new RelayCommand(o => {
-                CurrentView = new MenuViewModel();
+            ShowAccountCommand = new RelayCommand(o =>
+            {
+                if (!IsLoggedIn)
+                    return;
+
+                if (CurrentUser.Rol == "angajat")
+                    CurrentView = new EmployeeDashboardViewModel();
+                else
+                    CurrentView = new ClientDashboardViewModel(CurrentUser.Id);
             });
 
-            ShowLoginCommand = new RelayCommand(o => {
+            ShowMenuCommand = new RelayCommand(o =>
+                CurrentView = new MenuViewModel(_cartService));
+
+            ShowLoginCommand = new RelayCommand(o =>
+            {
                 var loginVm = new LoginViewModel();
 
-                // Callback succes login
-                loginVm.OnLoginSuccess = (user) => {
+                loginVm.OnLoginSuccess = (user) =>
+                {
                     CurrentUser = user;
-                    CurrentView = new MenuViewModel();
-                };
-
-                // Callback buton register din interiorul login-ului
-                loginVm.OnGoToRegister = () => {
-                    var regVm = new RegisterViewModel();
-                    regVm.OnRegisterSuccess = () => ShowLoginCommand.Execute(null);
-                    regVm.OnCancel = () => ShowLoginCommand.Execute(null);
-                    CurrentView = regVm;
+                    CurrentView = new MenuViewModel(_cartService);
                 };
 
                 CurrentView = loginVm;
             });
 
-            ShowCartCommand = new RelayCommand(o => {
+            ShowCartCommand = new RelayCommand(o =>
+            {
                 if (IsLoggedIn)
-                    CurrentView = new CartViewModel(new BusinessLogic.Services.CartService(), CurrentUser.Id);
+                    CurrentView = new CartViewModel(_cartService, CurrentUser.Id);
                 else
                     ShowLoginCommand.Execute(null);
             });
 
-            LogoutCommand = new RelayCommand(o => {
+            LogoutCommand = new RelayCommand(o =>
+            {
                 CurrentUser = null;
-                CurrentView = new MenuViewModel();
+                CurrentView = new MenuViewModel(_cartService);
             });
+
+            ShowRegisterCommand = new RelayCommand(o =>
+                CurrentView = new RegisterViewModel());
         }
     }
 }

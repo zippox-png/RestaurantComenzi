@@ -41,7 +41,6 @@ namespace RestaurantComenzi.UI.ViewModels
             }
         }
 
-        // O comanda poate fi anulata doar daca e activa (nu e deja livrata sau anulata)
         private bool CanAnula(object obj)
         {
             if (obj is Comanda c)
@@ -56,7 +55,7 @@ namespace RestaurantComenzi.UI.ViewModels
             if (obj is Comanda c)
             {
                 _comandaRepository.UpdateStare(c.Id, "anulata");
-                IncarcaComenzi(); // Refresh la lista de comenzi dupa modificare
+                IncarcaComenzi(); 
             }
         }
     }

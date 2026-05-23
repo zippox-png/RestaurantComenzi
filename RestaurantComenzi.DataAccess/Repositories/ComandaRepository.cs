@@ -20,9 +20,41 @@ namespace RestaurantComenzi.DataAccess.Repositories
                 command.Parameters.AddWithValue("@OraEstimativa", (object)comanda.OraEstimativaLivrare ?? DBNull.Value);
 
                 connection.Open();
-                // Returnează ID-ul noii comenzi
                 return Convert.ToInt32(command.ExecuteScalar());
             }
+        }
+
+        private List<Preparat> GetProdusePentruComanda(int comandaId)
+        {
+            var produse = new List<Preparat>(); 
+            using (var connection = GetConnection())
+            {
+                string query = @"
+            SELECT p.Denumire AS Denumire, d.Cantitate, p.Pret
+            FROM DetaliiComanda d
+            INNER JOIN Preparate p ON d.PreparatId = p.Id
+            WHERE d.ComandaId = @ComandaId";
+
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@ComandaId", comandaId);
+                    connection.Open();
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            produse.Add(new Preparat 
+                            {
+                                Denumire = reader["Denumire"].ToString(),
+                                CantitateTotala = Convert.ToInt32(reader["Cantitate"]),
+                                Pret = Convert.ToDecimal(reader["Pret"])
+                            });
+                        }
+                    }
+                }
+            }
+            return produse;
         }
 
         public List<Comanda> GetComenziClient(int utilizatorId)
@@ -40,23 +72,27 @@ namespace RestaurantComenzi.DataAccess.Repositories
                 {
                     while (reader.Read())
                     {
-                        comenzi.Add(new Comanda
+                        var comanda = new Comanda
                         {
                             Id = (int)reader["Id"],
+                            UtilizatorId = reader["UtilizatorId"] == DBNull.Value ? 0 : Convert.ToInt32(reader["UtilizatorId"]),
                             CodComanda = (Guid)reader["CodComanda"],
                             DataComanda = (DateTime)reader["DataComanda"],
                             Stare = reader["Stare"].ToString(),
                             PretTotal = (decimal)reader["PretTotal"],
                             CostTransport = (decimal)reader["CostTransport"],
                             OraEstimativaLivrare = reader["OraEstimativaLivrare"] != DBNull.Value ? (DateTime?)reader["OraEstimativaLivrare"] : null
-                        });
+                        };
+
+                        comanda.Produse = GetProdusePentruComanda(comanda.Id);
+
+                        comenzi.Add(comanda);
                     }
                 }
             }
             return comenzi;
         }
 
-        // METODA NOUĂ PENTRU ANGAJAȚI
         public List<Comanda> GetAllComenzi()
         {
             var comenzi = new List<Comanda>();

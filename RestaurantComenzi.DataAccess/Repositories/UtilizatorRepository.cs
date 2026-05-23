@@ -22,7 +22,7 @@ namespace RestaurantComenzi.DataAccess.Repositories
                     {
                         return new Utilizator
                         {
-                            Id = (int)reader["Id"],
+                            Id = Convert.ToInt32(reader["Id"]),
                             Nume = reader["Nume"].ToString(),
                             Prenume = reader["Prenume"].ToString(),
                             Email = reader["Email"].ToString(),

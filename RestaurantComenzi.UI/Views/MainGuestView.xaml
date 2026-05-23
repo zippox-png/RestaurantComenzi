@@ -24,13 +24,20 @@
                             <StackPanel Grid.Column="1" Margin="10,0">
                                 <TextBlock Text="{Binding Denumire}" FontWeight="Bold" FontSize="16"/>
                                 <TextBlock Text="{Binding CantitatiAfisate}"/>
-                                <TextBlock Text="{Binding Alergeni}" FontStyle="Italic" Foreground="Gray"/>
-                                <TextBlock Text="Indisponibil" Foreground="Red" Visibility="{Binding Disponibil, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+								<TextBlock Text="{Binding Alergeni}"
+										   Foreground="Red"
+										   FontSize="12"
+										   TextWrapping="Wrap"/>
+								<TextBlock Text="Disponibil"
+                                           Foreground="Green"
+                                           Visibility="{Binding Disponibil, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Pret, StringFormat={}{0} lei}" FontSize="18" HorizontalAlignment="Right"/>
-                                <Button Content="Adaugă în coș" Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding Id}" Margin="0,5,0,0"/>
-                            </StackPanel>
+								<Button Content="Adaugă în coș"
+										Command="{Binding DataContext.AddToCartCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+										CommandParameter="{Binding}"/>
+							</StackPanel>
                         </Grid>
                     </Border>
                 </DataTemplate>

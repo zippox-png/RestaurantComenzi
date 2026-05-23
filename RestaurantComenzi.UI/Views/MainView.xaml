@@ -12,109 +12,121 @@
         WindowStartupLocation="CenterScreen"
         Background="#F4F6F8">
 
-	<Window.Resources>
-		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#E85D04"/>
+        <SolidColorBrush x:Key="DarkBrush" Color="#1E1E1E"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#00ADB5"/>
 
-		<SolidColorBrush x:Key="PrimaryBrush" Color="#E85D04"/>
-		<SolidColorBrush x:Key="DarkBrush" Color="#1E1E1E"/>
-		<SolidColorBrush x:Key="LightBrush" Color="#F4F6F8"/>
-		<SolidColorBrush x:Key="CardBrush" Color="White"/>
-		<SolidColorBrush x:Key="GrayBrush" Color="#6C757D"/>
-
-		<Style TargetType="Button">
-			<Setter Property="Foreground" Value="White"/>
-			<Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
-			<Setter Property="BorderThickness" Value="0"/>
-			<Setter Property="Padding" Value="14,8"/>
-			<Setter Property="Margin" Value="5"/>
-			<Setter Property="Cursor" Value="Hand"/>
-			<Setter Property="FontWeight" Value="SemiBold"/>
-			<Setter Property="FontSize" Value="14"/>
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="Button">
-						<Border x:Name="border"
+        <Style TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
                                 Background="{TemplateBinding Background}"
                                 CornerRadius="10">
-							<ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
-						</Border>
-						<ControlTemplate.Triggers>
-							<Trigger Property="IsMouseOver" Value="True">
-								<Setter TargetName="border" Property="Opacity" Value="0.9"/>
-							</Trigger>
-							<Trigger Property="IsPressed" Value="True">
-								<Setter TargetName="border" Property="Opacity" Value="0.75"/>
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.75"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-		<DataTemplate DataType="{x:Type vms:LoginViewModel}">
-			<views:LoginView/>
-		</DataTemplate>
-		<DataTemplate DataType="{x:Type vms:MenuViewModel}">
-			<views:MainGuestView/>
-		</DataTemplate>
-		<DataTemplate DataType="{x:Type vms:RegisterViewModel}">
-			<views:RegisterView/>
-		</DataTemplate>
-		<DataTemplate DataType="{x:Type vms:CartViewModel}">
-			<views:CartView/>
-		</DataTemplate>
-		<DataTemplate DataType="{x:Type vms:ClientDashboardViewModel}">
-			<views:ClientDashboardView/>
-		</DataTemplate>
-		<DataTemplate DataType="{x:Type vms:EmployeeDashboardViewModel}">
-			<views:EmployeeDashboardView/>
-		</DataTemplate>
-	</Window.Resources>
+        <DataTemplate DataType="{x:Type vms:LoginViewModel}">
+            <views:LoginView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vms:MenuViewModel}">
+            <views:MainGuestView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vms:RegisterViewModel}">
+            <views:RegisterView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vms:CartViewModel}">
+            <views:CartView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vms:ClientDashboardViewModel}">
+            <views:ClientDashboardView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vms:EmployeeDashboardViewModel}">
+            <views:EmployeeDashboardView/>
+        </DataTemplate>
+    </Window.Resources>
 
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="80"/>
-			<RowDefinition Height="*"/>
-		</Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-		<Border Grid.Row="0" Background="{StaticResource DarkBrush}">
-			<Grid Margin="20,0">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="Auto"/>
-				</Grid.ColumnDefinitions>
+        <Border Grid.Row="0" Background="{StaticResource DarkBrush}" Panel.ZIndex="1">
+            <Grid Margin="20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-					<TextBlock Text="🍽 Restaurant" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,25,0" VerticalAlignment="Center"/>
-					<Button Content="MENIU" Width="120" Height="42" Background="#393E46" Command="{Binding ShowMenuCommand}"/>
-					<Button Content="COȘ CUMPĂRĂTURI" Width="170" Height="42" Background="{StaticResource PrimaryBrush}" Command="{Binding ShowCartCommand}"/>
-				</StackPanel>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="🍽 Restaurant" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,25,0" VerticalAlignment="Center"/>
+                    <Button Content="MENIU" Width="110" Height="42" Background="#393E46" Command="{Binding ShowMenuCommand}"/>
+                    <Button Content="COȘ" Width="110" Height="42" Command="{Binding ShowCartCommand}"/>
+                </StackPanel>
 
-				<StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-					<Button Content="LOGIN" Width="120" Height="42" Background="#00ADB5"
-                            Command="{Binding ShowLoginCommand}"
-                            Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
 
-					<StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                    <StackPanel Orientation="Horizontal"
+            Visibility="{Binding IsLoggedOut, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Button Content="CONECTARE" Width="120" Height="42"
+            Background="{StaticResource AccentBrush}"
+            Command="{Binding ShowLoginCommand}"/>
+
+                        <Button Content="CONT NOU" Width="120" Height="42"
+            Background="#393E46"
+            Command="{Binding ShowRegisterCommand}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" 
                                 Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}}">
-						<Border Background="#393E46" Padding="12,8" CornerRadius="10" Margin="0,0,10,0">
-							<TextBlock Text="{Binding CurrentUser.Nume, StringFormat='Salut, {0}!'}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center"/>
-						</Border>
-						<Button Content="CONTUL MEU" Width="130" Height="42" Background="#393E46"/>
-						<Button Content="LOGOUT" Width="120" Height="42" Background="#D62828" Command="{Binding LogoutCommand}"/>
-					</StackPanel>
-				</StackPanel>
-			</Grid>
-		</Border>
+                        <Border Background="#393E46" Padding="12,8" CornerRadius="10" Margin="0,0,10,0">
+                            <TextBlock Text="{Binding CurrentUser.Nume, StringFormat='Salut, {0}!'}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </Border>
+                        <Button Content="CONTUL MEU"
+        Width="120"
+        Height="42"
+        Background="#393E46"
+        Command="{Binding ShowAccountCommand}"/>
+                        <Button Content="LOGOUT" Width="100" Height="42" Background="#D62828" Command="{Binding LogoutCommand}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
 
-		<Grid Grid.Row="1" Margin="20">
-			<Border Background="White" CornerRadius="18" Padding="15">
-				<Border.Effect>
-					<DropShadowEffect BlurRadius="15" ShadowDepth="2" Opacity="0.15"/>
-				</Border.Effect>
-				<ContentControl Content="{Binding CurrentView}"/>
-			</Border>
-		</Grid>
-	</Grid>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid Margin="20">
+                <Border Background="White" CornerRadius="18" Padding="15">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="15" ShadowDepth="2" Opacity="0.15"/>
+                    </Border.Effect>
+
+                    <ContentControl Content="{Binding CurrentView}"/>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+
+    </Grid>
 </Window>

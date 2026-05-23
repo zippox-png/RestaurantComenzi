@@ -55,7 +55,7 @@ namespace RestaurantComenzi.UI.ViewModels
             if (user != null)
             {
                 ErrorMessage = string.Empty;
-                OnLoginSuccess?.Invoke(user); // Trimitem user-ul catre MainViewModel
+                OnLoginSuccess?.Invoke(user); 
             }
             else
             {

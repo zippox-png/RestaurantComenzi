@@ -1,0 +1,1 @@
+﻿ALTER TABLE Preparate ADD CategorieId INT NULL;

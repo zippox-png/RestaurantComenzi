@@ -9,8 +9,10 @@ namespace RestaurantComenzi.DataAccess.Entities
         public decimal Pret { get; set; }
         public string CantitatePortie { get; set; }
         public decimal CantitateTotala { get; set; }
-        public int CategorieId { get; set; }
+        public int? CategorieId { get; set; }
         public string ImaginePath { get; set; }
         public bool Disponibil { get; set; }
+        public List<Alergen> Alergeni { get; set; } = new();
+
     }
 }

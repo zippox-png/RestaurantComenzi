@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
 using RestaurantComenzi.BusinessLogic.Services;
@@ -16,7 +15,7 @@ namespace RestaurantComenzi.UI.ViewModels
         private readonly ComandaRepository _comandaRepository;
         private readonly int _currentUserId;
 
-        public ObservableCollection<CartItem> Items { get; set; }
+        public ObservableCollection<CartItem> Items => _cartService.Items;
 
         private decimal _totalBrut;
         public decimal TotalBrut { get => _totalBrut; set { _totalBrut = value; OnPropertyChanged(); } }
@@ -39,42 +38,36 @@ namespace RestaurantComenzi.UI.ViewModels
         public CartViewModel(CartService cartService, int currentUserId)
         {
             _cartService = cartService;
+            _currentUserId = currentUserId;
             _discountService = new DiscountService();
             _comandaRepository = new ComandaRepository();
-            _currentUserId = currentUserId;
 
-            Items = new ObservableCollection<CartItem>(_cartService.Items);
-
-            PlaseazaComandaCommand = new RelayCommand(PlaseazaComanda, CanPlasaComanda);
+            PlaseazaComandaCommand = new RelayCommand(PlaseazaComanda);
             StergeProdusCommand = new RelayCommand(StergeProdus);
 
-            CalculeazaTotaluri();
+            Recalculeaza();
         }
 
-        private void CalculeazaTotaluri()
+        private void Recalculeaza()
         {
             TotalBrut = _cartService.CalculeazaTotalBrut();
 
-            // Calculam numarul de comenzi anterioare ale clientului pentru discount
-            int istoricComenzi = _comandaRepository.GetComenziClient(_currentUserId).Count;
+            int istoric = _comandaRepository.GetComenziClient(_currentUserId).Count;
 
-            Discount = _discountService.CalculeazaDiscountComanda(TotalBrut, istoricComenzi);
+            Discount = _discountService.CalculeazaDiscountComanda(TotalBrut, istoric);
 
-            decimal pretDupaDiscount = TotalBrut - Discount;
-            CostTransport = _discountService.CalculeazaTransport(pretDupaDiscount);
+            decimal dupa = TotalBrut - Discount;
+            CostTransport = _discountService.CalculeazaTransport(dupa);
 
-            TotalFinal = pretDupaDiscount + CostTransport;
+            TotalFinal = dupa + CostTransport;
         }
-
-        private bool CanPlasaComanda(object obj) => Items.Any();
 
         private void StergeProdus(object obj)
         {
             if (obj is CartItem item)
             {
                 _cartService.StergeProdus(item.Produs);
-                Items.Remove(item);
-                CalculeazaTotaluri();
+                Recalculeaza();
             }
         }
 
@@ -85,18 +78,16 @@ namespace RestaurantComenzi.UI.ViewModels
                 UtilizatorId = _currentUserId,
                 PretTotal = TotalFinal,
                 CostTransport = CostTransport,
-                OraEstimativaLivrare = DateTime.Now.AddMinutes(45) // Livrare standard in 45 min
+                OraEstimativaLivrare = System.DateTime.Now.AddMinutes(45)
             };
 
-            // Inserare comanda in BD
-            int comandaId = _comandaRepository.InsertComanda(comanda);
+            _comandaRepository.InsertComanda(comanda);
 
-            // Curatam cosul
             _cartService.GolesteCosul();
-            Items.Clear();
-            CalculeazaTotaluri();
 
-            MesajComanda = $"Comanda plasată cu succes! Codul comenzii a fost generat. Timp estimat: 45 min.";
+            Recalculeaza();
+
+            MesajComanda = "Comanda plasată cu succes!";
         }
     }
 }

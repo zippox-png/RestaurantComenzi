@@ -12,5 +12,6 @@ namespace RestaurantComenzi.DataAccess.Entities
         public decimal PretTotal { get; set; }
         public decimal CostTransport { get; set; }
         public DateTime? OraEstimativaLivrare { get; set; }
+        public List<Preparat> Produse { get; set; } = new List<Preparat>();
     }
-}
+}   
